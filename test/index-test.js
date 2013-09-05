@@ -34,8 +34,57 @@ describe('Socket Server', function() {
       timeout(done);
     });
 
+    mark.on('viewers', function() {
+      done('error: it does not get events after disconnect');
+    });
+
     ivan.on('viewers', function() {
-      done('error: it emits only in related room');
+      done('error: it emits only in related tree');
+    });
+  });
+
+  it('emits `viewers` event after join', function(done) {
+    ivan.emit('tree', 1);
+    var next = _.after(3, done);
+
+    alex.on('viewers', function(data) { expect(data).length(3); next() });
+    mark.on('viewers', function(data) { expect(data).length(3); next() });
+    ivan.on('viewers', function(data) { expect(data).length(3); next() });
+  });
+
+  it('emits `sync` event', function(done) {
+    const json = { _id: 1, name: 'test' };
+    alex.emit('sync', { collection: 'trees', event: 'add', json: json });
+
+    mark.on('sync', function(data) {
+      expect(data.collection).equal('trees');
+      expect(data.event).equal('add');
+      expect(data.json).eql(json);
+      timeout(done);
+    });
+
+    alex.on('sync', function() {
+      done('error: it does not return event back');
+    });
+
+    ivan.on('sync', function() {
+      done('error: it broadcasts only in room with treeId');
+    });
+  });
+
+  it('handles error cases', function(done) {
+    var adri = connect(function() {
+      adri.emit('sync', { collection: 'trees', event: 'add', json: {} });
+      adri.disconnect();
+      timeout(done);
+    });
+
+    adri.on('viewers', function() {
+      done('error: he does not join the room');
+    });
+
+    adri.on('sync', function() {
+      done('error: it does not broadcast to yourself in empty room');
     });
   });
 
