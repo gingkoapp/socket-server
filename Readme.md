@@ -10,11 +10,11 @@
 ## Example
 
 ```js
-var socket = require('socket-server');
+var socketServer = require('socket-server');
 
 // first param is server instance,
 // second is a passport.socketio options
-socket.connect(server, {
+socketServer(server, {
   cookieParser: express.cookieParser
   secret:       sessionSecret
   store:        sessionStore

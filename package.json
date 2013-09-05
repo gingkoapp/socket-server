@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "repository": "git://github.com:ask11/socket-server.git",
   "scripts": {
+    "test": "mocha",
     "stat": "cloc lib client --quiet --by-file && cloc test/*.js --quiet --exclude-dir=support"
   },
   "dependencies": {
@@ -13,6 +14,7 @@
   "devDependencies": {
     "socket.io-client": "0.9.16",
     "chai": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "underscore": "*"
   }
 }
