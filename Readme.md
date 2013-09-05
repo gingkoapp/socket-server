@@ -2,6 +2,7 @@
 
   It's a simple and lightweight wrapper around [socket.io](http://socket.io)
   to support gingko's real-time collaboration.
+
   It handles only 2 events:
 
   * `tree`: connect to tree, and emit `viewers` `[{ _id, email, agent, socketId }, ...]` to all clients.
