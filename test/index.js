@@ -1,12 +1,10 @@
-process.env.NODE_ENV = 'test';
+var socketServer = require('..');
+var expect = require('chai').expect;
+var _ = require('underscore');
+var io = require('socket.io-client');
+var server = require('http').createServer();
 
-const socketServer = require('../lib');
-const expect       = require('chai').expect;
-const _            = require('underscore');
-const io           = require('socket.io-client');
-const server       = require('http').createServer();
-
-socketServer(server);
+socketServer(server, 1);
 server.listen(7357);
 
 describe('Socket Server', function() {
@@ -14,9 +12,9 @@ describe('Socket Server', function() {
 
   beforeEach(function(done) {
     var next = _.after(3, function() {
-      alex.emit('tree', 1);
-      mark.emit('tree', 1);
-      ivan.emit('tree', 2);
+      alex.emit('subscribe', [1]);
+      mark.emit('subscribe', [1]);
+      ivan.emit('subscribe', [2]);
       timeout(done);
     });
 
@@ -44,7 +42,7 @@ describe('Socket Server', function() {
   });
 
   it('emits `viewers` event after join', function(done) {
-    ivan.emit('tree', 1);
+    ivan.emit('subscribe', [1]);
     var next = _.after(3, done);
 
     alex.on('viewers', function(data) { expect(data).length(3); next() });
@@ -53,8 +51,8 @@ describe('Socket Server', function() {
   });
 
   it('emits `sync` event', function(done) {
-    const json = { _id: 1, name: 'test' };
-    alex.emit('sync', { collection: 'trees', event: 'add', json: json });
+    var json = { _id: 1, name: 'test' };
+    alex.emit('sync', { treeId: 1, collection: 'trees', event: 'add', json: json });
 
     mark.on('sync', function(data) {
       expect(data.collection).equal('trees');
@@ -104,7 +102,7 @@ function timeout(cb) {
 }
 
 function connect(cb) {
-  const socket = io.connect('http://localhost:7357/', { 'force new connection': true });
+  var socket = io.connect('http://localhost:7357/', { 'force new connection': true });
   socket.on('connect', cb);
   return socket;
 }

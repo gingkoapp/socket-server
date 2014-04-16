@@ -12,13 +12,14 @@ module.exports = socketServer;
  * with authentication support though `passportIo`.
  *
  * @param {Server} server
+ * @param {Number} logLevel - 0..3
  * @param {Object} ops
  */
 
-function socketServer(server, ops) {
+function socketServer(server, logLevel, ops) {
   var io = socketIo.listen(server);
 
-  io.set('log level', ops.logLevel || 1);
+  io.set('log level', logLevel);
   if (ops) io.set('authorization', passportIo.authorize(ops));
 
   io.configure('production', function() {
@@ -53,8 +54,8 @@ function socketServer(server, ops) {
     function leave() {
       if (!trees) return;
       trees.forEach(socket.leave.bind(socket));
-      trees = null;
       viewers();
+      trees = null;
     }
 
     function viewers() {
