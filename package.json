@@ -1,11 +1,11 @@
 {
   "name": "socket-server",
   "version": "0.1.0",
-  "repository": "git://github.com:ask11/socket-server.git",
+  "repository": "git://github.com:gingkoapp/socket-server.git",
   "main": "lib/index.js",
   "scripts": {
-    "test": "mocha",
-    "stat": "cloc lib --quiet --by-file && cloc test/*.js --quiet --by-file"
+    "test": "mocha -R spec",
+    "stat": "cloc index.js --quiet --by-file && cloc test/*.js --quiet --by-file"
   },
   "dependencies": {
     "socket.io": "0.9.16",

@@ -5,7 +5,7 @@
 
   It handles only 2 events:
 
-  * `tree`: connect to tree, and emit `viewers` `[{ _id, email, agent, socketId }, ...]` to all clients.
+  * `subscribe`: join list of trees, and emit `viewers` `[{ _id, email, agent, socketId }, ...]` to all clients.
   * `sync`: something happen in selected tree, and broadcast `sync`.
 
 ## Example
@@ -14,9 +14,8 @@
 var socketServer = require('socket-server');
 
 // first param is server instance,
-// second is a passport.socketio options
-socketServer(server, {
-  logLevel: 3, // debug
+// third is logLevel and third is a passport.socketio options
+socketServer(server, 3, {
   cookieParser: express.cookieParser,
   secret: sessionSecret,
   store: sessionStore,
