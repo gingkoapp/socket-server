@@ -1,51 +1,85 @@
-const socketIo   = require('socket.io');
-const passportIo = require('passport.socketio');
-const socketInfo = require('./socket-info');
+var socketIo = require('socket.io');
+var passportIo = require('passport.socketio');
 
-module.exports = function(server, options) {
-  const io = socketIo.listen(server);
+/**
+ * Expose `socketServer()`.
+ */
 
-  io.set('log level', options.logLevel || 1);
-  if (options) io.set('authorization', passportIo.authorize(options));
+module.exports = socketServer;
+
+/**
+ * Create new socket.io instance to `server`
+ * with authentication support though `passportIo`.
+ *
+ * @param {Server} server
+ * @param {Object} ops
+ */
+
+function socketServer(server, ops) {
+  var io = socketIo.listen(server);
+
+  io.set('log level', ops.logLevel || 1);
+  if (ops) io.set('authorization', passportIo.authorize(ops));
 
   io.configure('production', function() {
     io.enable('browser client minification'); // send minified client
-    io.enable('browser client etag');         // apply etag caching logic based on version number
-    io.enable('browser client gzip');         // gzip the file
+    io.enable('browser client etag'); // apply etag caching logic based on version number
+    io.enable('browser client gzip'); // gzip response
   });
 
   io.sockets.on('connection', function(socket) {
-    var treeId = null;
+    var trees = null;
 
-    // join new tree (room)
-    socket.on('tree', function(newTreeId) {
-      if (newTreeId === treeId) return;
+    // join new tree, which contain trees as ['id1', 'id2', 'id3']
+    // first argumnent is always main tree.
+    socket.on('subscribe', function(newTrees) {
+      if (trees && trees[0] === newTrees[0]) return;
       leave();
 
-      treeId = newTreeId;
-      socket.join(newTreeId);
+      trees = newTrees;
+      trees.forEach(socket.join.bind(socket));
       viewers();
     });
 
     // sync whatever you need
-    socket.on('sync', function (data) {
-      if (!treeId) return;
-      socket.broadcast.to(treeId).emit('sync', data);
+    socket.on('sync', function(data) {
+      if (!trees) return;
+      socket.broadcast.to(data.treeId).emit('sync', data);
     });
 
     // emit `viewers` on disconnect
     socket.on('disconnect', leave);
 
     function leave() {
-      if (!treeId) return;
-      socket.leave(treeId);
+      if (!trees) return;
+      trees.forEach(socket.leave.bind(socket));
+      trees = null;
       viewers();
     }
 
     function viewers() {
-      const sockets = io.sockets.clients(treeId);
-      const data    = sockets.map(socketInfo);
-      if (data.length) io.sockets.in(treeId).emit('viewers', data);
+      trees.forEach(function(treeId) {
+        var sockets = io.sockets.clients(treeId);
+        var data = sockets.map(socketInfo);
+        if (data.length) io.sockets.in(treeId).emit('viewers', data);
+      });
     }
   });
-};
+}
+
+/**
+ * Get info about `socket`.
+ *
+ * @param {Socket} socket
+ * @return {Object} json - { email, id, agent, socketId }
+ */
+
+function socketInfo(socket) {
+  var user = socket.handshake.user;
+  var json = user ? user.toJSON() : {};
+
+  json.agent = socket.handshake.headers['user-agent'] || '';
+  json.socketId = socket.id;
+
+  return json;
+}
