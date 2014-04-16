@@ -34,11 +34,9 @@ function socketServer(server, logLevel, ops) {
     // join new tree, which contain trees as ['id1', 'id2', 'id3']
     // first argumnent is always main tree.
     socket.on('subscribe', function(newTrees) {
-      if (trees && trees[0] === newTrees[0]) return;
       leave();
-
       trees = newTrees;
-      trees.forEach(socket.join.bind(socket));
+      trees.forEach(function(id) { socket.join(id) });
       viewers();
     });
 
@@ -53,9 +51,8 @@ function socketServer(server, logLevel, ops) {
 
     function leave() {
       if (!trees) return;
-      trees.forEach(socket.leave.bind(socket));
+      trees.forEach(function(id) { socket.leave(id) });
       viewers();
-      trees = null;
     }
 
     function viewers() {

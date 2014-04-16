@@ -70,6 +70,21 @@ describe('Socket Server', function() {
     });
   });
 
+  it('supports multiply trees', function(done) {
+    ivan.emit('subscribe', [2, 1]);
+    var next = _.after(4, done);
+
+    alex.on('viewers', function(data) { expect(data).length(3); next() });
+    mark.on('viewers', function(data) { expect(data).length(3); next() });
+
+    ivan.on('viewers', function(data) {
+      data.length > 1
+        ? expect(data).length(3)
+        : expect(data).length(1);
+      next();
+    });
+  });
+
   it('handles error cases', function(done) {
     var adri = connect(function() {
       adri.emit('sync', { collection: 'trees', event: 'add', json: {} });
