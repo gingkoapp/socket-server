@@ -1,12 +1,11 @@
 const socketIo   = require('socket.io');
 const passportIo = require('passport.socketio');
 const socketInfo = require('./socket-info');
-const logLevel   = process.env.NODE_ENV ? 1 : 3;
 
 module.exports = function(server, options) {
   const io = socketIo.listen(server);
 
-  io.set('log level', logLevel);
+  io.set('log level', options.logLevel || 1);
   if (options) io.set('authorization', passportIo.authorize(options));
 
   io.configure('production', function() {

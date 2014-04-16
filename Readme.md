@@ -16,8 +16,9 @@ var socketServer = require('socket-server');
 // first param is server instance,
 // second is a passport.socketio options
 socketServer(server, {
-  cookieParser: express.cookieParser
-  secret:       sessionSecret
-  store:        sessionStore
+  logLevel: 3, // debug
+  cookieParser: express.cookieParser,
+  secret: sessionSecret,
+  store: sessionStore,
 });
 ```
