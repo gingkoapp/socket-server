@@ -9,13 +9,12 @@
   },
   "dependencies": {
     "socket.io": "0.9.16",
-    "ua-parser": "~0.3.3",
-    "passport.socketio": "~1.2.1"
+    "passport.socketio": "^3.0.1"
   },
   "devDependencies": {
     "socket.io-client": "0.9.16",
-    "chai": "*",
-    "mocha": "*",
-    "underscore": "*"
+    "chai": "^1.9.1",
+    "mocha": "^1.18.2",
+    "underscore": "^1.6.0"
   }
 }
