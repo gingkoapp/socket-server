@@ -1,8 +1,8 @@
 {
   "name": "socket-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": "git://github.com:gingkoapp/socket-server.git",
-  "main": "lib/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha -R spec",
     "stat": "cloc index.js --quiet --by-file && cloc test/*.js --quiet --by-file"
